@@ -5,65 +5,48 @@ document.addEventListener("DOMContentLoaded", function(){
     const clearButtons = document.querySelector(".clear");
     const equalsButtons = document.querySelector(".equals");
 
-    let currentInput = "";
-    let firstOperand ="";
-    let operator ="";
+    let currentExpression = "";
 
     numberButtons.forEach(button => {
         button.addEventListener("click", function () {
-            currentInput += this.dataset.number;
-            display.value += this.dataset.number;
+            currentExpression += this.dataset.number;
+            display.value = currentExpression;
         });
     });
 
     operatorButtons.forEach(button => {
         button.addEventListener("click", function () {
-            if (currentInput === "") return;
-
-            if (firstOperand !== "") {
-                calculate();
+            if (currentExpression === "") {
+                currentExpression = "";
             }
-
-            firstOperand = currentInput;
-            operator = this.dataset.operator;
-            display.value += "" + operator + "";
-            currentInput = "";
+            currentExpression += " " + this.dataset.operator + " ";
+            display.value = currentExpression;
         });
     });
 
     equalsButtons.addEventListener("click", function () {
-        if (firstOperand ==="" || currentInput ==="" || operator ==="") return;
-        display.value += " = ";
-        calculate();
+        if (currentExpression === "") {
+            display.value = "undefined";
+            return;
+        }
+
+        try {
+            let result = eval(currentExpression);
+        if (isNaN(result) || !isFinite(result)) {
+            display.value = "infinity";
+        } else {
+            display.value = result;
+            currentExpression = result.toString();
+        }
+        } catch (error) {
+            display.value = "エラー";
+            currentExpression = "";
+        }
     });
 
     clearButtons.addEventListener("click", function () {
-        currentInput = "";
-        firstOperand = "";
-        operator = "";
+        currentExpression = "";
         display.value = "";
     });
 
-    function calculate() {
-        let result;
-        switch (operator) {
-            case "+":
-                result = parseFloat(firstOperand) + parseFloat(currentInput);
-                break;
-            case "-":
-                result = parseFloat(firstOperand) - parseFloat(currentInput);
-                break;
-            case "*":
-                result = parseFloat(firstOperand) * parseFloat(currentInput);
-                break;
-            case "/":
-                result = currentInput === "0" ? "エラー": parseFloat(firstOperand) / parseFloat(currentInput);
-                break;
-        }
-
-        display.value = result;
-        firstOperand = result.toString();
-        currentInput = "";
-        operator = "";
-    }
 });
